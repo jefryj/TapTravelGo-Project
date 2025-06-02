@@ -27,6 +27,15 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
+// Package schema and model
+const packageSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+  description: String,
+  price: Number
+});
+const Package = mongoose.model('Package', packageSchema, 'packages');
+
 // Signup route
 app.post('/api/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
@@ -79,6 +88,24 @@ app.get('/api/db-status', async (req, res) => {
     res.json({ connected: true });
   } catch (err) {
     res.status(500).json({ connected: false, error: err.message });
+  }
+});
+
+// Add this route to get all packages
+app.get('/api/packages', async (req, res) => {
+  try {
+    const packages = await Package.find({});
+    // Map backend fields to frontend expected fields
+    const mapped = packages.map(pkg => ({
+      _id: pkg._id,
+      name: pkg.name,
+      img: pkg.image, // use 'image' from DB
+      desc: pkg.description, // use 'description' from DB
+      rate: pkg.price !== undefined && pkg.price !== null ? `₹${pkg.price.toLocaleString()}` : '' // use 'price' from DB
+    }));
+    res.json(mapped);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch packages' });
   }
 });
 
