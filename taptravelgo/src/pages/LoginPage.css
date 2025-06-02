@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
+
+.login-bg {
+  position: relative;
+  min-height: 100vh;
+  background: url('https://images.pexels.com/photos/811029/pexels-photo-811029.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') center center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8vw;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.login-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Adjust alpha for more or less opacity */
+  z-index: 0;
+}
+
+.login-card,
+.login-left {
+  position: relative;
+  z-index: 1;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(0px) saturate(140%);
+  -webkit-backdrop-filter: blur(3px) saturate(140%);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(27,87,147,0.18), 0 2px 10px rgba(27,87,147,0.09);
+  padding: 2.8rem 2.2rem 2.2rem 2.2rem;
+  width: 100%;
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+  color: #1b5793;
+}
+
+.login-card:hover {
+  box-shadow: 0 12px 40px rgba(27,87,147,0.22), 0 2px 12px rgba(27,87,147,0.12);
+}
+
+.login-logo,
+.brand {
+  display: none;
+}
+
+.login-title {
+  font-size: 2rem;
+  color: #1b5793;
+  margin-bottom: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-align: center;
+  text-shadow: 0 2px 8px #c3a53a22;
+  background: linear-gradient(90deg, #1b5793 0%, #5f3ac3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-form label {
+  font-size: 1rem;
+  color: #010910;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  letter-spacing: 0.5px;
+}
+
+.login-form input {
+  padding: 0.8rem 1.1rem;
+  border: 1.5px solid #e3e3e3;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  background: #f8fafc;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(27, 87, 147, 0.03);
+  color: #1b5793;
+}
+
+.login-form input:focus {
+  border: 2px solid #1b5793;
+  background: #f0f6ff;
+  box-shadow: 0 2px 8px rgba(27, 87, 147, 0.08);
+}
+
+.login-form button {
+  margin-top: 0.7rem;
+  padding: 0.8rem 0;
+  background: linear-gradient(90deg, #1b5793 60%, #c3a53a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.13rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(27, 87, 147, 0.08);
+  letter-spacing: 1px;
+}
+
+.login-form button:hover {
+  background: linear-gradient(90deg, #c3a53a 0%, #1b5793 100%);
+  box-shadow: 0 4px 16px rgba(27, 87, 147, 0.13);
+}
+
+.login-footer {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: #eef5fb;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-link {
+  color:  #0ee624;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.signup-link:hover {
+  color: #0cbe30;
+  text-decoration: underline;
+}
+
+.login-left {
+  max-width: 500px;
+  color: #2c87e3;
+  animation: fadeIn 1.2s ease-in-out;
+  text-align: left;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  padding-left: 2vw;
+  margin-right: auto;
+  /* Remove glassy background and shadow */
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.main-heading {
+  font-size: 4.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  font-family: Dosis;
+  color: #ffffff;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.sub-text {
+  font-size: 2.3rem;
+  margin-bottom: 0.7rem;
+  color: #00fd8b;
+  opacity: 0.85;
+  font-family: Dosis;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

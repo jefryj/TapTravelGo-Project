@@ -1,0 +1,481 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  /* Add a soft gradient background */
+  background: linear-gradient(135deg, #f7e9e3 0%, #e3f0ff 100%);
+  position: relative;
+  padding-top: 60px; /* Add this if not present to prevent content from hiding under navbar */
+}
+
+/* Decorative SVG wave at the top */
+body::before {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 120px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="120" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H1440V80C1200 120 800 40 0 80V0Z" fill="%231b5793" fill-opacity="0.12"/></svg>') no-repeat top center;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Decorative SVG wave at the bottom */
+body::after {
+  content: "";
+  display: block;
+  position: fixed;
+  bottom: 0; left: 0; width: 100vw; height: 120px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="120" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 40C600 80 1200 0 1440 40V120H0V40Z" fill="%231b5793" fill-opacity="0.10"/></svg>') no-repeat bottom center;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.Header{
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(90deg, #1b5793 60%, #9c4313 100%);
+  padding: 0.5rem 0;
+  box-shadow: 0 4px 24px rgba(27,87,147,0.13), 0 1.5px 8px rgba(27,87,147,0.06);
+  z-index: 1000;
+  transition: background 0.3s;
+}
+
+.navbar {
+  width: 100%;
+}
+
+.nav-list {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0 2vw;
+  width: 100%;
+}
+
+.nav-item {
+  margin: 0 1.5rem;
+}
+
+.nav-item .mainheading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 2.5px;
+  margin-right: 2.5rem;
+  text-align: left;
+  text-shadow: 0 2px 12px #38f9d7aa, 0 1px 0 #fff;
+  background: linear-gradient(90deg, #fff 40%, #c3a53a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-item:first-child {
+  margin-right: auto;
+}
+
+.nav-item a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.08rem;
+  transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+  padding: 0.5rem 1.1rem;
+  border-radius: 22px;
+  position: relative;
+}
+
+.nav-item a:hover {
+  color: #1b5793;
+  background: #fff;
+  box-shadow: 0 2px 12px #38f9d733;
+  text-decoration: none;
+}
+
+.Footer{
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #fff;
+  background: linear-gradient(90deg, #1b5793 60%, #9c4313 100%);
+  position: static;
+  height: 64px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.08rem;
+  letter-spacing: 1.2px;
+  box-shadow: 0 -2px 16px rgba(27,87,147,0.08);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+
+.Footer span, .Footer p {
+  color: #fff;
+  opacity: 0.92;
+  margin: 0;
+  padding: 0 1rem;
+  font-weight: 500;
+  text-shadow: 0 1px 8px #c3a53a33;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  width: 260px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.card-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  margin: 0.5rem 0 0.25rem 0;
+  font-size: 1.2rem;
+  color: #2d3a4b;
+}
+
+.card p {
+  color: #5a6b7b;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+.contact-container {
+  max-width: 900px;
+  margin: 48px auto;
+  padding: 2.5rem 2rem 2rem 2rem;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f7e9e3 100%);
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(27,87,147,0.10), 0 1.5px 8px rgba(27,87,147,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-container::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #c3a53a33 0%, #e3f0ff 80%);
+  opacity: 0.5;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.contact-container::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #1b579344 0%, #f7e9e3 80%);
+  opacity: 0.5;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.contact-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #1b5793;
+  background: linear-gradient(90deg, #1b5793 60%, #c3a53a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-form {
+  flex: 1 1 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 14px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 2px 12px rgba(27,87,147,0.04);
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  gap: 6px;
+  color: #1b5793;
+  font-size: 1.08rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 12px;
+  border: 1.5px solid #c3a53a;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  background: #f8fafc;
+  transition: border 0.2s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border: 2px solid #1b5793;
+  outline: none;
+}
+
+.contact-form textarea {
+  min-height: 90px;
+}
+
+.contact-form button {
+  align-self: flex-start;
+  padding: 12px 28px;
+  background: linear-gradient(90deg, #1b5793 60%, #c3a53a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.08rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(27,87,147,0.08);
+}
+
+.contact-form button:hover {
+  background: linear-gradient(90deg, #c3a53a 0%, #1b5793 100%);
+}
+
+.contact-info {
+  flex: 1 1 260px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 14px;
+  padding: 1.2rem 1.1rem;
+  font-size: 1.08rem;
+  color: #1b5793;
+  box-shadow: 0 2px 12px rgba(27,87,147,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-info h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #c3a53a;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.contact-info p,
+.contact-info a {
+  color: #1b5793;
+  text-decoration: none;
+  font-size: 1.05rem;
+  margin: 0;
+  word-break: break-all;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+  color: #f093fb;
+}
+
+.AboutUs {
+  background: linear-gradient(135deg, #f7e9e3 0%, #e3f0ff 100%);
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(27,87,147,0.10), 0 1.5px 8px rgba(27,87,147,0.06);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  max-width: 950px;
+  margin: 48px auto 48px auto;
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #1b5793;
+  position: relative;
+  overflow: hidden;
+}
+
+.AboutUs::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, #c3a53a33 0%, #f7e9e3 80%);
+  opacity: 0.5;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.AboutUs::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, #1b579344 0%, #e3f0ff 80%);
+  opacity: 0.5;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.AboutUs h2 {
+  text-align: center;
+  color: #1b5793;
+  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #1b5793 60%, #c3a53a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  z-index: 1;
+  position: relative;
+}
+
+.AboutUs h3 {
+  color: #c3a53a;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  z-index: 1;
+  position: relative;
+}
+
+.AboutUs p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  margin-bottom: 1.2rem;
+  color: #222;
+  background: rgba(255,255,255,0.7);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  z-index: 1;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(27,87,147,0.04);
+}
+
+.AboutUs ul {
+  margin-left: 1.2rem;
+  margin-bottom: 1.2rem;
+  padding-left: 1.2rem;
+  z-index: 1;
+  position: relative;
+}
+
+.AboutUs li {
+  font-size: 1.08rem;
+  margin-bottom: 0.5rem;
+  color: #1b5793;
+  background: rgba(195,165,58,0.08);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 1000px) {
+  .AboutUs {
+    padding: 2rem 1rem;
+    max-width: 98vw;
+  }
+  .AboutUs h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .AboutUs {
+    padding: 1.2rem 0.5rem;
+    margin: 24px 0;
+  }
+  .AboutUs h2 {
+    font-size: 1.3rem;
+  }
+  .AboutUs h3 {
+    font-size: 1.1rem;
+  }
+  .AboutUs p, .AboutUs li {
+    font-size: 1rem;
+    padding: 0.7rem 0.7rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .contact-content {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .contact-form, .contact-info {
+    width: 100%;
+    min-width: unset;
+  }
+  .contact-container {
+    padding: 1.2rem 0.5rem;
+  }
+}
