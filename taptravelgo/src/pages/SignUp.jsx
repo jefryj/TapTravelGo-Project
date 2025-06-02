@@ -5,40 +5,15 @@ import './LoginPage.css';
 function SignUp() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
   const navigate = useNavigate();
-  const [error, setError] = useState('');
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    setError('');
-    if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    try {
-      // If your frontend runs on a different port than your backend, use the full backend URL:
-      const res = await fetch('http://localhost:5000/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          password: form.password
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        navigate('/login');
-      } else {
-        setError(data.error || 'Signup failed');
-      }
-    } catch (err) {
-      setError('Server error');
-    }
+    // Add sign up logic here
+    navigate('/home');
   };
 
   React.useEffect(() => {
@@ -114,7 +89,6 @@ function SignUp() {
               required
             />
           </label>
-          {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
           <button type="submit">Sign Up</button>
         </form>
         <div className="login-footer">
