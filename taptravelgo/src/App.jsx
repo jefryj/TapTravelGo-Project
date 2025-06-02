@@ -7,6 +7,7 @@ import Contact from './pages/Contact.jsx'
 import AboutUs from './pages/AboutUs.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignUp from './pages/SignUp.jsx'
+import AdminLogin from './pages/AdminLogin'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
         <Route path="/home" element={
           <>
             <Header search={search} setSearch={setSearch} />
