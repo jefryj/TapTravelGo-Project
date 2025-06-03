@@ -8,9 +8,10 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/taptravelgo');
-
-// Check MongoDB connection status on server start
+mongoose.connect('mongodb://localhost:27017/taptravelgo', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 mongoose.connection.on('connected', () => {
   console.log('MongoDB connection established successfully!');
 });
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   password: String
 });
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema, 'users'); // <-- specify 'users' collection
 
 // Package schema and model
 const packageSchema = new mongoose.Schema({
@@ -46,8 +47,12 @@ const Admin = mongoose.model('Admin', adminSchema, 'admin');
 // Signup route
 app.post('/api/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
+  // Add validation
+  if (!name || !email || !phone || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
   try {
-    // Check if user already exists
+    console.log('Signup request:', req.body);
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ error: 'Email already exists' });
@@ -55,7 +60,7 @@ app.post('/api/signup', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const user = new User({ name, email, phone, password: hashed });
     await user.save();
-    console.log('User created:', { name, email, phone }); // <-- This log confirms data is saved
+    console.log('User created:', { name, email, phone });
     res.json({ success: true });
   } catch (err) {
     console.error('Signup error:', err);
@@ -66,12 +71,15 @@ app.post('/api/signup', async (req, res) => {
 // Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  // Add validation
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
   try {
-    // Only authenticate users that exist in the database (created via signup)
+    console.log('Login request:', req.body);
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
-    // Compare the hashed password
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
 
@@ -85,6 +93,10 @@ app.post('/api/login', async (req, res) => {
 // Admin login route
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
+  // Add validation
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required' });
+  }
   try {
     const admin = await Admin.findOne({ username });
     if (!admin || admin.password !== password) {
