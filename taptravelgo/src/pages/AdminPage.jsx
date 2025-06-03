@@ -6,7 +6,13 @@ function AdminPage() {
     image: '',
     price: '',
     description: '',
-    detailedDescription: ''
+    detailedDescription: '',
+    images: ['', '', ''],
+    day1: '',
+    day2: '',
+    day3: '',
+    day4: '',
+    day5: ''
   });
   const [packages, setPackages] = useState([]);
   const [error, setError] = useState('');
@@ -28,7 +34,15 @@ function AdminPage() {
   };
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name.startsWith('images[')) {
+      const idx = parseInt(name.match(/\d+/)[0], 10);
+      const newImages = [...form.images];
+      newImages[idx] = value;
+      setForm({ ...form, images: newImages });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
     setError('');
     setSuccess('');
   };
@@ -37,8 +51,16 @@ function AdminPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!form.name || !form.image || !form.price || !form.description || !form.detailedDescription) {
-      setError('All fields are required');
+    if (
+      !form.name ||
+      !form.image ||
+      !form.price ||
+      !form.description ||
+      !form.detailedDescription ||
+      form.images.some(img => !img) ||
+      !form.day1 || !form.day2 || !form.day3 || !form.day4 || !form.day5
+    ) {
+      setError('All fields, 3 images, and 5 days are required');
       return;
     }
     try {
@@ -50,7 +72,13 @@ function AdminPage() {
           image: form.image,
           price: Number(form.price),
           description: form.description,
-          detailedDescription: form.detailedDescription
+          detailedDescription: form.detailedDescription,
+          images: form.images,
+          day1: form.day1,
+          day2: form.day2,
+          day3: form.day3,
+          day4: form.day4,
+          day5: form.day5
         }),
       });
       if (!res.ok) {
@@ -59,7 +87,19 @@ function AdminPage() {
         return;
       }
       setSuccess('Package added successfully');
-      setForm({ name: '', image: '', price: '', description: '', detailedDescription: '' });
+      setForm({
+        name: '',
+        image: '',
+        price: '',
+        description: '',
+        detailedDescription: '',
+        images: ['', '', ''],
+        day1: '',
+        day2: '',
+        day3: '',
+        day4: '',
+        day5: ''
+      });
       fetchPackages();
     } catch {
       setError('Server error');
@@ -99,7 +139,7 @@ function AdminPage() {
           />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <label>Image URL</label>
+          <label>Image URL (Main)</label>
           <input
             type="text"
             name="image"
@@ -107,6 +147,42 @@ function AdminPage() {
             onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, marginTop: 4 }}
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Additional Image 1</label>
+          <input
+            type="text"
+            name="images[0]"
+            value={form.images[0]}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="URL for additional image 1"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Additional Image 2</label>
+          <input
+            type="text"
+            name="images[1]"
+            value={form.images[1]}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="URL for additional image 2"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Additional Image 3</label>
+          <input
+            type="text"
+            name="images[2]"
+            value={form.images[2]}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="URL for additional image 3"
           />
         </div>
         <div style={{ marginBottom: 12 }}>
@@ -138,6 +214,66 @@ function AdminPage() {
             onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, marginTop: 4 }}
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Day 1</label>
+          <input
+            type="text"
+            name="day1"
+            value={form.day1}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="Itinerary for Day 1"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Day 2</label>
+          <input
+            type="text"
+            name="day2"
+            value={form.day2}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="Itinerary for Day 2"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Day 3</label>
+          <input
+            type="text"
+            name="day3"
+            value={form.day3}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="Itinerary for Day 3"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Day 4</label>
+          <input
+            type="text"
+            name="day4"
+            value={form.day4}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="Itinerary for Day 4"
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Day 5</label>
+          <input
+            type="text"
+            name="day5"
+            value={form.day5}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+            placeholder="Itinerary for Day 5"
           />
         </div>
         {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}

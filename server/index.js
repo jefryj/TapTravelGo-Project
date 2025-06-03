@@ -34,7 +34,13 @@ const packageSchema = new mongoose.Schema({
   image: String,
   description: String,
   price: Number,
-  detailedDescription: { type: String, required: true } // <-- required
+  detailedDescription: { type: String, required: true },
+  images: [String],
+  day1: { type: String, required: true },
+  day2: { type: String, required: true },
+  day3: { type: String, required: true },
+  day4: { type: String, required: true },
+  day5: { type: String, required: true }
 });
 const Package = mongoose.model('Package', packageSchema, 'packages');
 
@@ -143,19 +149,48 @@ app.get('/api/packages', async (req, res) => {
   }
 });
 
-// Add a package (detailedDescription required)
+// Add a package (detailedDescription, images, and day1-day5 required)
 app.post('/api/packages', async (req, res) => {
-  const { name, image, price, description, detailedDescription } = req.body;
-  // Debug log
+  const {
+    name, image, price, description, detailedDescription,
+    images, day1, day2, day3, day4, day5
+  } = req.body;
+
+  // Debug log to verify incoming data
   console.log('Add package request:', req.body);
-  if (!name || !image || !price || !description || !detailedDescription) {
-    return res.status(400).json({ error: 'All fields are required' });
+
+  if (
+    !name ||
+    !image ||
+    !price ||
+    !description ||
+    !detailedDescription ||
+    !images ||
+    !Array.isArray(images) ||
+    images.length !== 3 ||
+    images.some(img => !img) ||
+    !day1 || !day2 || !day3 || !day4 || !day5
+  ) {
+    return res.status(400).json({ error: 'All fields, 3 images, and 5 days are required' });
   }
   try {
-    const pkg = new Package({ name, image, price, description, detailedDescription });
+    const pkg = new Package({
+      name,
+      image,
+      price,
+      description,
+      detailedDescription,
+      images,
+      day1,
+      day2,
+      day3,
+      day4,
+      day5
+    });
     await pkg.save();
     res.json({ success: true, package: pkg });
   } catch (err) {
+    console.error('Failed to add package:', err);
     res.status(500).json({ error: 'Failed to add package' });
   }
 });

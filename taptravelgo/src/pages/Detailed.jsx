@@ -8,6 +8,9 @@ function Detailed() {
   const [error, setError] = useState('');
   const [booked, setBooked] = useState(false);
 
+  // For image slider/transition
+  const [currentImg, setCurrentImg] = useState(0);
+
   useEffect(() => {
     fetch(`http://localhost:5000/api/packages/${id}`)
       .then(res => res.json())
@@ -17,6 +20,15 @@ function Detailed() {
       })
       .catch(() => setError('Failed to load package'));
   }, [id]);
+
+  useEffect(() => {
+    if (pkg && pkg.images && pkg.images.length === 3) {
+      const interval = setInterval(() => {
+        setCurrentImg(prev => (prev + 1) % 3);
+      }, 2500);
+      return () => clearInterval(interval);
+    }
+  }, [pkg]);
 
   const handleBook = () => {
     // Implement booking logic here (e.g., POST to /api/bookings)
@@ -29,7 +41,29 @@ function Detailed() {
   return (
     <div className="detailed-container">
       <h2 className="detailed-title">{pkg.name}</h2>
-      <img className="detailed-image" src={pkg.image} alt={pkg.name} />
+      {/* Only show the 3 extra images as a slider */}
+      {pkg.images && pkg.images.length === 3 && (
+        <div className="detailed-gallery-slider">
+          {pkg.images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`Gallery ${idx + 1}`}
+              className={`detailed-gallery-img${currentImg === idx ? ' active' : ''}`}
+              style={{ opacity: currentImg === idx ? 1 : 0, zIndex: currentImg === idx ? 2 : 1 }}
+            />
+          ))}
+          <div className="detailed-gallery-dots">
+            {pkg.images.map((_, idx) => (
+              <span
+                key={idx}
+                className={currentImg === idx ? 'active' : ''}
+                onClick={() => setCurrentImg(idx)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="detailed-price">
         <strong>Price:</strong> <span>₹{pkg.price}</span>
       </div>
@@ -40,6 +74,14 @@ function Detailed() {
       <div className="detailed-longdesc">
         <strong>Detailed Description:</strong>
         <div>{pkg.detailedDescription || 'No detailed description available.'}</div>
+      </div>
+      <div className="detailed-days-cards">
+        {[1,2,3,4,5].map(day => (
+          <div className="detailed-day-card" key={day}>
+            <div className="detailed-day-title">Day {day}</div>
+            <div className="detailed-day-content">{pkg[`day${day}`]}</div>
+          </div>
+        ))}
       </div>
       <div className="detailed-btn-wrap">
         <button
