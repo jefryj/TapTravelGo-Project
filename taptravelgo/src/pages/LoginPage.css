@@ -3,7 +3,7 @@
 .login-bg {
   position: relative;
   min-height: 100vh;
-  background: url('https://images.pexels.com/photos/811029/pexels-photo-811029.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') center center/cover no-repeat;
+  background: url('https://wallpapercave.com/wp/wp11497937.jpg') center center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -42,7 +42,7 @@
   flex-direction: column;
   align-items: center;
   transition: box-shadow 0.2s;
-  color: #1b5793;
+  color: #103457;
 }
 
 .login-card:hover {
@@ -56,13 +56,13 @@
 
 .login-title {
   font-size: 2rem;
-  color: #1b5793;
+  color: #1578db;
   margin-bottom: 1.7rem;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-align: center;
   text-shadow: 0 2px 8px #c3a53a22;
-  background: linear-gradient(90deg, #1b5793 0%, #5f3ac3 100%);
+  background: linear-gradient(90deg, #a00d08 0%, #4e14ef 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -76,8 +76,8 @@
 }
 
 .login-form label {
-  font-size: 1rem;
-  color: #010910;
+  font-size: 1.3rem;
+  color: #000000;
   font-weight: 500;
   display: flex;
   flex-direction: column;

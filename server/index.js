@@ -142,5 +142,30 @@ app.get('/api/packages', async (req, res) => {
   }
 });
 
+// Add a package
+app.post('/api/packages', async (req, res) => {
+  const { name, image, price, description } = req.body;
+  if (!name || !image || !price || !description) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  try {
+    const pkg = new Package({ name, image, price, description });
+    await pkg.save();
+    res.json({ success: true, package: pkg });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add package' });
+  }
+});
+
+// Delete a package
+app.delete('/api/packages/:id', async (req, res) => {
+  try {
+    await Package.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete package' });
+  }
+});
+
 app.listen(5000, () => console.log('Server running on port 5000'));
 

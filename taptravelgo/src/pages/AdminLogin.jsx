@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function AdminLogin() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,8 +24,8 @@ function AdminLogin() {
         setError(data.message || 'Login failed');
         return;
       }
-      // On success, redirect or set admin session as needed
-      alert('Admin login successful');
+      // On success, redirect to admin page
+      navigate('/adminpage');
     } catch {
       setError('Server error');
     }

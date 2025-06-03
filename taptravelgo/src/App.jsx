@@ -8,6 +8,7 @@ import AboutUs from './pages/AboutUs.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import SignUp from './pages/SignUp.jsx'
 import AdminLogin from './pages/AdminLogin'
+import AdminPage from './pages/AdminPage'
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/adminlogin" element={<AdminLogin />} />
+        <Route path="/adminpage" element={<AdminPage />} />
         <Route path="/home" element={
           <>
             <Header search={search} setSearch={setSearch} />
