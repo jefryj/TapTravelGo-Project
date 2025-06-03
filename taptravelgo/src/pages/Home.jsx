@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 function Home({ search, setSearch }) {
   const [packages, setPackages] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('http://localhost:5000/api/packages')
@@ -45,12 +47,17 @@ function Home({ search, setSearch }) {
       </div>
       <h2 className="available-packages-heading">Available Packages</h2>
       <div className="card-container">
-        {filtered.map((d) => (
-          <div className="card" key={d._id || d.name}>
-            <img src={d.img} alt={d.name} className="card-img"/>
-            <h3>{d.name}</h3>
-            <p>{d.desc}</p>
-            <div className="card-rate">{d.rate}</div>
+        {filtered.map((pkg) => (
+          <div
+            key={pkg._id}
+            onClick={() => navigate(`/detailed/${pkg._id}`)}
+            style={{ cursor: 'pointer' }}
+            className="card"
+          >
+            <img src={pkg.img} alt={pkg.name} className="card-img"/>
+            <h3>{pkg.name}</h3>
+            <p>{pkg.desc}</p>
+            <div className="card-rate">{pkg.rate}</div>
           </div>
         ))}
       </div>

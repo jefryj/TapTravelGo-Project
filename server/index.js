@@ -33,7 +33,8 @@ const packageSchema = new mongoose.Schema({
   name: String,
   image: String,
   description: String,
-  price: Number
+  price: Number,
+  detailedDescription: { type: String, required: true } // <-- required
 });
 const Package = mongoose.model('Package', packageSchema, 'packages');
 
@@ -142,18 +143,31 @@ app.get('/api/packages', async (req, res) => {
   }
 });
 
-// Add a package
+// Add a package (detailedDescription required)
 app.post('/api/packages', async (req, res) => {
-  const { name, image, price, description } = req.body;
-  if (!name || !image || !price || !description) {
+  const { name, image, price, description, detailedDescription } = req.body;
+  // Debug log
+  console.log('Add package request:', req.body);
+  if (!name || !image || !price || !description || !detailedDescription) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   try {
-    const pkg = new Package({ name, image, price, description });
+    const pkg = new Package({ name, image, price, description, detailedDescription });
     await pkg.save();
     res.json({ success: true, package: pkg });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add package' });
+  }
+});
+
+// Get a single package by ID
+app.get('/api/packages/:id', async (req, res) => {
+  try {
+    const pkg = await Package.findById(req.params.id);
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+    res.json(pkg);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch package' });
   }
 });
 

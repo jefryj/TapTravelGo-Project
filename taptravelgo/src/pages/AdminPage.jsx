@@ -5,7 +5,8 @@ function AdminPage() {
     name: '',
     image: '',
     price: '',
-    description: ''
+    description: '',
+    detailedDescription: ''
   });
   const [packages, setPackages] = useState([]);
   const [error, setError] = useState('');
@@ -36,7 +37,7 @@ function AdminPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!form.name || !form.image || !form.price || !form.description) {
+    if (!form.name || !form.image || !form.price || !form.description || !form.detailedDescription) {
       setError('All fields are required');
       return;
     }
@@ -48,7 +49,8 @@ function AdminPage() {
           name: form.name,
           image: form.image,
           price: Number(form.price),
-          description: form.description
+          description: form.description,
+          detailedDescription: form.detailedDescription
         }),
       });
       if (!res.ok) {
@@ -57,7 +59,7 @@ function AdminPage() {
         return;
       }
       setSuccess('Package added successfully');
-      setForm({ name: '', image: '', price: '', description: '' });
+      setForm({ name: '', image: '', price: '', description: '', detailedDescription: '' });
       fetchPackages();
     } catch {
       setError('Server error');
@@ -123,6 +125,16 @@ function AdminPage() {
           <textarea
             name="description"
             value={form.description}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: 8, marginTop: 4 }}
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>Detailed Description</label>
+          <textarea
+            name="detailedDescription"
+            value={form.detailedDescription}
             onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, marginTop: 4 }}
