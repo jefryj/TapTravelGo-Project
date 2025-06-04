@@ -226,6 +226,51 @@ app.delete('/api/packages/:id', async (req, res) => {
   }
 });
 
+// Update a package
+app.put('/api/packages/:id', async (req, res) => {
+  const {
+    name, image, price, description, detailedDescription,
+    images, day1, day2, day3, day4, day5
+  } = req.body;
+  if (
+    !name ||
+    !image ||
+    !price ||
+    !description ||
+    !detailedDescription ||
+    !images ||
+    !Array.isArray(images) ||
+    images.length !== 3 ||
+    images.some(img => !img) ||
+    !day1 || !day2 || !day3 || !day4 || !day5
+  ) {
+    return res.status(400).json({ error: 'All fields, 3 images, and 5 days are required' });
+  }
+  try {
+    const pkg = await Package.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        image,
+        price,
+        description,
+        detailedDescription,
+        images,
+        day1,
+        day2,
+        day3,
+        day4,
+        day5
+      },
+      { new: true }
+    );
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+    res.json({ success: true, package: pkg });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update package' });
+  }
+});
+
 // Contact message route
 app.post('/api/messages', async (req, res) => {
   const { name, email, subject, message } = req.body;

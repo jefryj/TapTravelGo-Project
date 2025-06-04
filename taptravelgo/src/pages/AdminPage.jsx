@@ -20,6 +20,20 @@ function AdminPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    image: '',
+    price: '',
+    description: '',
+    detailedDescription: '',
+    images: ['', '', ''],
+    day1: '',
+    day2: '',
+    day3: '',
+    day4: '',
+    day5: ''
+  });
 
   // Fetch packages on mount
   useEffect(() => {
@@ -141,6 +155,115 @@ function AdminPage() {
   const handleNotificationsClick = () => {
     setShowNotifications(!showNotifications);
     if (!showNotifications) fetchMessages();
+  };
+
+  const handleEditClick = async pkg => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/packages/${pkg._id}`);
+      const data = await res.json();
+      setEditId(pkg._id);
+      setEditForm({
+        name: data.name || '',
+        image: data.image || '',
+        price: data.price !== undefined && data.price !== null ? String(data.price) : '',
+        description: data.description || '',
+        detailedDescription: data.detailedDescription || '',
+        images: Array.isArray(data.images)
+          ? [
+              data.images[0] || '',
+              data.images[1] || '',
+              data.images[2] || ''
+            ]
+          : ['', '', ''],
+        day1: data.day1 || '',
+        day2: data.day2 || '',
+        day3: data.day3 || '',
+        day4: data.day4 || '',
+        day5: data.day5 || ''
+      });
+      setError('');
+      setSuccess('');
+    } catch {
+      setError('Failed to load package details for editing');
+    }
+  };
+
+  const handleEditChange = e => {
+    const { name, value } = e.target;
+    if (name.startsWith('images[')) {
+      const idx = parseInt(name.match(/\d+/)[0], 10);
+      const newImages = [...editForm.images];
+      newImages[idx] = value;
+      setEditForm({ ...editForm, images: newImages });
+    } else {
+      setEditForm({ ...editForm, [name]: value });
+    }
+  };
+
+  const handleEditSubmit = async e => {
+    e.preventDefault();
+    // Only send fields that have a value, but always send all fields to backend for consistency
+    // However, allow empty fields to keep their previous value
+    const updatedFields = {};
+    Object.keys(editForm).forEach(key => {
+      // If the field is not empty, use the new value; else, use the old value from the package
+      if (
+        editForm[key] !== '' &&
+        !(Array.isArray(editForm[key]) && editForm[key].every(img => img === ''))
+      ) {
+        updatedFields[key] = editForm[key];
+      } else {
+        // Find the original package and use its value
+        const pkg = packages.find(p => p._id === editId);
+        if (pkg) {
+          if (key === 'images') {
+            updatedFields[key] = Array.isArray(pkg.images) && pkg.images.length === 3
+              ? [...pkg.images]
+              : ['', '', ''];
+          } else {
+            updatedFields[key] = pkg[key] ?? '';
+          }
+        }
+      }
+    });
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/packages/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...updatedFields,
+          price: Number(updatedFields.price)
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Failed to update package');
+        return;
+      }
+      setSuccess('Package updated successfully');
+      setEditId(null);
+      fetchPackages();
+    } catch {
+      setError('Server error');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditId(null);
+    setEditForm({
+      name: '',
+      image: '',
+      price: '',
+      description: '',
+      detailedDescription: '',
+      images: ['', '', ''],
+      day1: '',
+      day2: '',
+      day3: '',
+      day4: '',
+      day5: ''
+    });
   };
 
   return (
@@ -353,19 +476,81 @@ function AdminPage() {
       <h3>Existing Packages</h3>
       <div>
         {packages.length === 0 && <div>No packages found.</div>}
-        {packages.map(pkg => (
-          <div key={pkg._id} style={{ border: '1px solid #ddd', borderRadius: 8, marginBottom: 16, padding: 12, display: 'flex', alignItems: 'center' }}>
-            <img src={pkg.img || pkg.image} alt={pkg.name} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16, borderRadius: 4 }} />
-            <div style={{ flex: 1 }}>
-              <div><strong>{pkg.name}</strong></div>
-              <div>{pkg.desc || pkg.description}</div>
-              <div style={{ color: '#555' }}>{pkg.rate || `₹${pkg.price}`}</div>
+        {packages.map(pkg =>
+          editId === pkg._id ? (
+            <form key={pkg._id} onSubmit={handleEditSubmit} style={{ border: '1px solid #0984e3', borderRadius: 8, marginBottom: 16, padding: 12, background: '#f1f8ff' }}>
+              <div style={{ marginBottom: 8 }}>
+                <label>Place Name</label>
+                <input type="text" name="name" value={editForm.name} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Image URL (Main)</label>
+                <input type="text" name="image" value={editForm.image} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Additional Image 1</label>
+                <input type="text" name="images[0]" value={editForm.images[0]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Additional Image 2</label>
+                <input type="text" name="images[1]" value={editForm.images[1]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Additional Image 3</label>
+                <input type="text" name="images[2]" value={editForm.images[2]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Price</label>
+                <input type="number" name="price" value={editForm.price} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Description</label>
+                <textarea name="description" value={editForm.description} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Detailed Description</label>
+                <textarea name="detailedDescription" value={editForm.detailedDescription} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Day 1</label>
+                <input type="text" name="day1" value={editForm.day1} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Day 2</label>
+                <input type="text" name="day2" value={editForm.day2} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Day 3</label>
+                <input type="text" name="day3" value={editForm.day3} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Day 4</label>
+                <input type="text" name="day4" value={editForm.day4} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <label>Day 5</label>
+                <input type="text" name="day5" value={editForm.day5} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+              </div>
+              <button type="submit" style={{ marginRight: 8, background: '#27ae60', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Save</button>
+              <button type="button" onClick={handleCancelEdit} style={{ background: '#636e72', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Cancel</button>
+            </form>
+          ) : (
+            <div key={pkg._id} style={{ border: '1px solid #ddd', borderRadius: 8, marginBottom: 16, padding: 12, display: 'flex', alignItems: 'center' }}>
+              <img src={pkg.img || pkg.image} alt={pkg.name} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16, borderRadius: 4 }} />
+              <div style={{ flex: 1 }}>
+                <div><strong>{pkg.name}</strong></div>
+                <div>{pkg.desc || pkg.description}</div>
+                <div style={{ color: '#555' }}>{pkg.rate || `₹${pkg.price}`}</div>
+              </div>
+              <button onClick={() => handleEditClick(pkg)} style={{ marginLeft: 8, background: '#0984e3', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                Edit
+              </button>
+              <button onClick={() => handleDelete(pkg._id)} style={{ marginLeft: 8, background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                Delete
+              </button>
             </div>
-            <button onClick={() => handleDelete(pkg._id)} style={{ marginLeft: 16, background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
-              Delete
-            </button>
-          </div>
-        ))}
+          )
+        )}
       </div>
     </div>
   );
