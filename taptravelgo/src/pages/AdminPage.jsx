@@ -17,6 +17,9 @@ function AdminPage() {
   const [packages, setPackages] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   // Fetch packages on mount
   useEffect(() => {
@@ -31,6 +34,18 @@ function AdminPage() {
     } catch {
       setError('Failed to fetch packages');
     }
+  };
+
+  const fetchMessages = async () => {
+    setLoadingMessages(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/messages');
+      const data = await res.json();
+      setMessages(data);
+    } catch {
+      setMessages([]);
+    }
+    setLoadingMessages(false);
   };
 
   const handleChange = e => {
@@ -123,9 +138,63 @@ function AdminPage() {
     }
   };
 
+  const handleNotificationsClick = () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications) fetchMessages();
+  };
+
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', padding: 24 }}>
       <h2>Admin Package Management</h2>
+      <button
+        onClick={handleNotificationsClick}
+        style={{
+          marginBottom: 20,
+          padding: '10px 18px',
+          background: '#0984e3',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          fontWeight: 600,
+          cursor: 'pointer'
+        }}
+      >
+        {showNotifications ? 'Hide Notifications' : 'Show Notifications'}
+      </button>
+      {showNotifications && (
+        <div style={{
+          background: '#f9fafc',
+          border: '1px solid #eaeaea',
+          borderRadius: 10,
+          marginBottom: 24,
+          padding: 18,
+          maxHeight: 340,
+          overflowY: 'auto'
+        }}>
+          <h3 style={{ marginTop: 0 }}>Contact Messages</h3>
+          {loadingMessages && <div>Loading...</div>}
+          {!loadingMessages && messages.length === 0 && <div>No messages found.</div>}
+          {!loadingMessages && messages.length > 0 && (
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {messages.map(msg => (
+                <li key={msg._id} style={{
+                  marginBottom: 18,
+                  padding: 12,
+                  borderBottom: '1px solid #e0e0e0'
+                }}>
+                  <div><strong>Name:</strong> {msg.name}</div>
+                  <div><strong>Email:</strong> {msg.email}</div>
+                  <div><strong>Subject:</strong> {msg.subject}</div>
+                  <div><strong>Message:</strong> {msg.message}</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>
+                    {msg.createdAt ? new Date(msg.createdAt).toLocaleString() : ''}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <form onSubmit={handleSubmit} style={{ marginBottom: 32, border: '1px solid #ccc', padding: 16, borderRadius: 8 }}>
         <div style={{ marginBottom: 12 }}>
           <label>Place Name</label>

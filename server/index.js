@@ -51,6 +51,16 @@ const adminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model('Admin', adminSchema, 'admin');
 
+// Message schema and model
+const messageSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  subject: String,
+  message: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const Message = mongoose.model('Message', messageSchema, 'messages');
+
 // Signup route
 app.post('/api/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
@@ -213,6 +223,31 @@ app.delete('/api/packages/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete package' });
+  }
+});
+
+// Contact message route
+app.post('/api/messages', async (req, res) => {
+  const { name, email, subject, message } = req.body;
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  try {
+    const msg = new Message({ name, email, subject, message });
+    await msg.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// Get all messages (for admin notifications)
+app.get('/api/messages', async (req, res) => {
+  try {
+    const messages = await Message.find({}).sort({ createdAt: -1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
 

@@ -2,17 +2,36 @@ import React, { useState } from "react";
 import "../index.css";
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+    setSuccess("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // You can add form submission logic here
-    alert("Thank you for contacting us!");
-    setForm({ name: "", email: "", message: "" });
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch("http://localhost:5000/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to send message");
+        return;
+      }
+      setSuccess("Message sent successfully!");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch {
+      setError("Server error");
+    }
   };
 
   return (
@@ -41,6 +60,16 @@ const Contact = () => {
             />
           </label>
           <label>
+            Subject
+            <input
+              type="text"
+              name="subject"
+              value={form.subject}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label>
             Message
             <textarea
               name="message"
@@ -51,6 +80,8 @@ const Contact = () => {
           </label>
           <button type="submit">Send Message</button>
         </form>
+        {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
+        {success && <div style={{ color: "green", marginTop: 8 }}>{success}</div>}
         <div className="contact-info">
           <h3>Our Information</h3>
           <p>Email: info@taptravelgo.com</p>
