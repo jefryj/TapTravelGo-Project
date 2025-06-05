@@ -69,6 +69,8 @@ const bookingSchema = new mongoose.Schema({
   passengers: Number,
   boarding: String,
   bill: Number,
+  startDate: String,
+  status: { type: String, default: 'not paid' }, // <-- Add status field
   createdAt: { type: Date, default: Date.now }
 });
 const Booking = mongoose.model('Booking', bookingSchema, 'booking');
@@ -310,8 +312,7 @@ app.get('/api/messages', async (req, res) => {
 
 // Add booking route
 app.post('/api/booking', async (req, res) => {
-  const { email, name, destination, passengers, boarding, bill } = req.body;
-  // Fix: allow bill=0 and passengers=0 only if explicitly set, but not undefined/null/empty
+  const { email, name, destination, passengers, boarding, bill, startDate } = req.body;
   if (
     !email ||
     !name ||
@@ -319,12 +320,22 @@ app.post('/api/booking', async (req, res) => {
     typeof passengers !== 'number' ||
     passengers < 1 ||
     !boarding ||
-    typeof bill !== 'number'
+    typeof bill !== 'number' ||
+    !startDate
   ) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   try {
-    const booking = new Booking({ email, name, destination, passengers, boarding, bill });
+    const booking = new Booking({
+      email,
+      name,
+      destination,
+      passengers,
+      boarding,
+      bill,
+      startDate,
+      status: 'not paid' // <-- Set status as not paid on booking
+    });
     await booking.save();
     res.json({ success: true });
   } catch (err) {
@@ -341,6 +352,18 @@ app.get('/api/mytrips', async (req, res) => {
     res.json(trips);
   } catch {
     res.json([]);
+  }
+});
+
+// Update booking status to paid
+app.post('/api/booking/pay', async (req, res) => {
+  const { bookingId } = req.body;
+  if (!bookingId) return res.status(400).json({ error: 'Booking ID required' });
+  try {
+    await Booking.findByIdAndUpdate(bookingId, { status: 'paid' });
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to update payment status' });
   }
 });
 

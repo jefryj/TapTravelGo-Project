@@ -6,12 +6,24 @@ function UPIPayment() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const amount = params.get('amount') || '0';
+  const bookingId = params.get('bookingId');
   const [paid, setPaid] = useState(false);
 
-  const handlePay = () => {
+  const handlePay = async () => {
     setPaid(true);
+    if (bookingId) {
+      try {
+        await fetch('http://localhost:5000/api/booking/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        });
+      } catch {
+        // Optionally show error, but still redirect
+      }
+    }
     setTimeout(() => {
-      navigate('/home');
+      navigate('/mytrips');
     }, 2000);
   };
 
@@ -66,7 +78,7 @@ function UPIPayment() {
           </button>
         ) : (
           <div style={{ color: '#27ae60', fontWeight: 600, fontSize: 18, marginTop: 10 }}>
-            Payment Successful! Redirecting to Home...
+            Payment Successful! Redirecting to My Trips...
           </div>
         )}
       </div>

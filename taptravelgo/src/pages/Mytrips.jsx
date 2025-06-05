@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Mytrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let user = {};
@@ -30,6 +32,10 @@ function Mytrips() {
         setLoading(false);
       });
   }, []);
+
+  const handleContinuePayment = (trip) => {
+    navigate(`/upi-payment?amount=${trip.bill}&bookingId=${trip._id}`);
+  };
 
   return (
     <div style={{
@@ -110,6 +116,14 @@ function Mytrips() {
                   <span style={{ color: '#0984e3', fontWeight: 600 }}>Boarding: <span style={{ color: '#353b48', fontWeight: 500 }}>{trip.boarding}</span></span>
                   <span style={{ color: '#0984e3', fontWeight: 600 }}>Total Bill: <span style={{ color: '#27ae60', fontWeight: 700 }}>₹{trip.bill}</span></span>
                 </div>
+                <div style={{ color: '#636e72', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
+                  <span>
+                    <strong>Start Date:</strong>{' '}
+                    {trip.startDate
+                      ? new Date(trip.startDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })
+                      : 'N/A'}
+                  </span>
+                </div>
                 <div style={{
                   fontSize: 14,
                   color: '#636e72',
@@ -118,6 +132,34 @@ function Mytrips() {
                 }}>
                   Booked At: {trip.createdAt ? new Date(trip.createdAt).toLocaleString() : ''}
                 </div>
+                <div style={{
+                  marginTop: 10,
+                  fontWeight: 600,
+                  color: trip.status === 'paid' ? '#27ae60' : '#e17055',
+                  fontSize: 16
+                }}>
+                  Status: {trip.status === 'paid' ? 'Paid' : 'Not Paid'}
+                </div>
+                {trip.status !== 'paid' && (
+                  <button
+                    onClick={() => handleContinuePayment(trip)}
+                    style={{
+                      marginTop: 10,
+                      background: 'linear-gradient(90deg, #27ae60 60%, #00b894 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      fontSize: 16,
+                      fontWeight: 600,
+                      padding: '10px 0',
+                      cursor: 'pointer',
+                      width: 160,
+                      alignSelf: 'flex-end'
+                    }}
+                  >
+                    Continue Payment
+                  </button>
+                )}
               </li>
             ))}
           </ul>
