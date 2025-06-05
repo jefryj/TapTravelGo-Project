@@ -20,6 +20,9 @@ function LoginPage() {
       });
       const data = await res.json();
       if (data.success) {
+        // Save user info to both localStorage and sessionStorage for booking page compatibility
+        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('user', JSON.stringify(data.user));
         navigate('/home');
       } else {
         setError(data.error || 'Login failed');

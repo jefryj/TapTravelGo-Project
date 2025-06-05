@@ -61,6 +61,18 @@ const messageSchema = new mongoose.Schema({
 });
 const Message = mongoose.model('Message', messageSchema, 'messages');
 
+// Booking schema and model
+const bookingSchema = new mongoose.Schema({
+  email: String,
+  name: String,
+  destination: String,
+  passengers: Number,
+  boarding: String,
+  bill: Number,
+  createdAt: { type: Date, default: Date.now }
+});
+const Booking = mongoose.model('Booking', bookingSchema, 'booking');
+
 // Signup route
 app.post('/api/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
@@ -293,6 +305,42 @@ app.get('/api/messages', async (req, res) => {
     res.json(messages);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+// Add booking route
+app.post('/api/booking', async (req, res) => {
+  const { email, name, destination, passengers, boarding, bill } = req.body;
+  // Fix: allow bill=0 and passengers=0 only if explicitly set, but not undefined/null/empty
+  if (
+    !email ||
+    !name ||
+    !destination ||
+    typeof passengers !== 'number' ||
+    passengers < 1 ||
+    !boarding ||
+    typeof bill !== 'number'
+  ) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  try {
+    const booking = new Booking({ email, name, destination, passengers, boarding, bill });
+    await booking.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save booking' });
+  }
+});
+
+// Get all bookings for a user
+app.get('/api/mytrips', async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.json([]);
+  try {
+    const trips = await Booking.find({ email }).sort({ createdAt: -1 });
+    res.json(trips);
+  } catch {
+    res.json([]);
   }
 });
 

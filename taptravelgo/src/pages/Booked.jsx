@@ -1,19 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function Booked() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [pkg, setPkg] = useState(null);
   const [passengers, setPassengers] = useState(1);
   const [boarding, setBoarding] = useState('');
   const [bill, setBill] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [bookingTime, setBookingTime] = useState('');
+  const [user, setUser] = useState({ name: '', email: '' });
+  const [paymentDone, setPaymentDone] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/packages/${id}`)
       .then(res => res.json())
       .then(data => setPkg(data));
+    // Try to get user info from localStorage/sessionStorage if available
+    let storedUser = {};
+    try {
+      // Use sessionStorage as fallback if localStorage is blocked
+      storedUser =
+        (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))) ||
+        (sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))) ||
+        {};
+    } catch {
+      storedUser = {};
+    }
+    setUser({ name: storedUser.name || '', email: storedUser.email || '' });
   }, [id]);
 
   useEffect(() => {
@@ -22,10 +37,56 @@ function Booked() {
     }
   }, [pkg, passengers]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setBookingTime(new Date().toLocaleString());
-    setShowSummary(true);
+    // Ensure passengers and bill are numbers, and all fields are present
+    const bookingData = {
+      email: user.email?.trim(),
+      name: user.name?.trim(),
+      destination: pkg.name?.trim(),
+      passengers: Number(passengers),
+      boarding: boarding.trim(),
+      bill: Number(bill)
+    };
+    // Check for missing fields before sending
+    if (
+      !bookingData.email ||
+      !bookingData.name ||
+      !bookingData.destination ||
+      !bookingData.boarding ||
+      isNaN(bookingData.passengers) ||
+      bookingData.passengers < 1 ||
+      isNaN(bookingData.bill) ||
+      bookingData.bill < 1
+    ) {
+      alert(
+        'All fields are required and you must be logged in.\n' +
+        'Please log in before booking. If you are logged in and still see this, your browser may be blocking storage.\n' +
+        'Try a different browser, disable tracking prevention, or allow third-party cookies for this site.'
+      );
+      return;
+    }
+    try {
+      const res = await fetch('http://localhost:5000/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Booking failed.');
+        return;
+      }
+      setShowSummary(true);
+    } catch {
+      alert('Server error. Please try again.');
+    }
+  };
+
+  const handlePayment = () => {
+    // Navigate to dummy UPI payment page
+    navigate(`/upi-payment?amount=${bill}`);
   };
 
   if (!pkg) return <div style={{ textAlign: 'center', marginTop: 40 }}>Loading...</div>;
@@ -88,7 +149,12 @@ function Booked() {
             boxShadow: '0 4px 24px rgba(44,62,80,0.10)'
           }}>
             <img
-              src={pkg.image}
+              src={
+                pkg.image &&
+                !pkg.image.includes('i.pinimg.com/originals/d8/9e/3d/d89e3d0cc3a4f986b496b1844e1bbac8.jpg')
+                  ? pkg.image
+                  : 'https://via.placeholder.com/400x200?text=Image+Unavailable'
+              }
               alt={pkg.name}
               style={{
                 width: '90%',
@@ -98,6 +164,10 @@ function Booked() {
                 objectFit: 'cover',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
                 display: 'block'
+              }}
+              onError={e => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/400x200?text=Image+Unavailable';
               }}
             />
             <form onSubmit={handleSubmit} style={{ width: '90%', margin: '0 auto' }}>
@@ -177,7 +247,7 @@ function Booked() {
               </button>
             </form>
           </div>
-          {/* Back Side (Booking Summary) */}
+          {/* Back Side (Booking Summary & Payment) */}
           <div style={{
             backfaceVisibility: 'hidden',
             position: 'absolute',
@@ -218,10 +288,41 @@ function Booked() {
                   <strong>Booking Time:</strong> {bookingTime}
                 </div>
               </div>
-              <div style={{ textAlign: 'center', color: '#0984e3', fontWeight: 500 }}>
-                Thank you for booking with TapTravelGo!   
-                Your boarding time will be notified soon through your mail.
-              </div>
+              {!paymentDone ? (
+                <button
+                  onClick={handlePayment}
+                  style={{
+                    width: '100%',
+                    padding: '16px 0',
+                    background: 'linear-gradient(90deg, #0984e3 60%, #00b894 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 20,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    marginTop: 10,
+                    marginBottom: 10,
+                    boxShadow: '0 2px 8px rgba(39, 174, 96, 0.08)',
+                    transition: 'background 0.2s, opacity 0.2s'
+                  }}
+                >
+                  Pay ₹{bill}
+                </button>
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  color: '#27ae60',
+                  fontWeight: 600,
+                  fontSize: 18,
+                  marginTop: 10,
+                  marginBottom: 10
+                }}>
+                  Payment Successful!<br />
+                  Thank you for booking with TapTravelGo!<br />
+                  Your boarding time will be notified soon through your mail.
+                </div>
+              )}
             </div>
           </div>
         </div>
