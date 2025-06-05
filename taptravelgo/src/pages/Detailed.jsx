@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './Detailed.css';
 
 function Detailed() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [pkg, setPkg] = useState(null);
   const [error, setError] = useState('');
   const [booked, setBooked] = useState(false);
@@ -31,8 +32,7 @@ function Detailed() {
   }, [pkg]);
 
   const handleBook = () => {
-    // Implement booking logic here (e.g., POST to /api/bookings)
-    setBooked(true);
+    navigate(`/booked/${pkg._id}`);
   };
 
   if (error) return <div className="detailed-error">{error}</div>;

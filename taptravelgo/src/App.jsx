@@ -10,6 +10,7 @@ import SignUp from './pages/SignUp.jsx'
 import AdminLogin from './pages/AdminLogin'
 import AdminPage from './pages/AdminPage'
 import Detailed from './pages/Detailed';
+import Booked from './pages/Booked';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/adminlogin" element={<AdminLogin />} />
         <Route path="/adminpage" element={<AdminPage />} />
         <Route path="/detailed/:id" element={<Detailed />} />
+        <Route path="/booked/:id" element={<Booked />} />
         <Route path="/home" element={
           <>
             <Header search={search} setSearch={setSearch} />
