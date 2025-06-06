@@ -49,6 +49,10 @@ function AdminPage() {
   });
   const [activeTab, setActiveTab] = useState(''); // '', 'notifications', 'booked', 'add', 'edit'
 
+  // Add admin message state for cancellation
+  const [adminMessage, setAdminMessage] = useState('');
+  const [showMessageBoxId, setShowMessageBoxId] = useState(null);
+
   // Fetch packages and bookings on mount
   useEffect(() => {
     fetchPackages();
@@ -341,10 +345,23 @@ function AdminPage() {
     }
   };
 
-  // Delete a booking
-  const handleBookingDelete = async bookingId => {
-    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+  // Remove customer and send cancel message to canceltext collection
+  const handleBookingDelete = async (bookingId, email) => {
+    setShowMessageBoxId(bookingId);
+  };
+
+  const confirmRemoveCustomer = async (bookingId, email) => {
+    if (!window.confirm('Are you sure you want to remove this customer?')) return;
     try {
+      // Send cancel message to canceltext collection
+      if (adminMessage && email) {
+        await fetch('http://localhost:5000/api/canceltext', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, message: adminMessage })
+        });
+      }
+      // Remove booking
       const res = await fetch(`http://localhost:5000/api/booking/${bookingId}`, {
         method: 'DELETE'
       });
@@ -352,6 +369,8 @@ function AdminPage() {
         alert('Failed to delete booking');
         return;
       }
+      setShowMessageBoxId(null);
+      setAdminMessage('');
       fetchBookings();
     } catch {
       alert('Server error');
@@ -537,9 +556,36 @@ function AdminPage() {
                     <button onClick={() => handleBookingEdit(booking)} style={{ background: '#0984e3', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
                       Edit
                     </button>
-                    <button onClick={() => handleBookingDelete(booking._id)} style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                    <button
+                      onClick={() => handleBookingDelete(booking._id, booking.email)}
+                      style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}
+                    >
                       Remove Customer
                     </button>
+                    {showMessageBoxId === booking._id && (
+                      <div style={{ marginTop: 10, width: '100%' }}>
+                        <textarea
+                          placeholder="Message to customer (optional)"
+                          value={adminMessage}
+                          onChange={e => setAdminMessage(e.target.value)}
+                          style={{ width: '100%', minHeight: 60, borderRadius: 6, border: '1px solid #b2bec3', marginBottom: 8, padding: 6 }}
+                        />
+                        <div>
+                          <button
+                            onClick={() => confirmRemoveCustomer(booking._id, booking.email)}
+                            style={{ background: '#27ae60', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 16px', marginRight: 8, fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            Confirm Remove
+                          </button>
+                          <button
+                            onClick={() => { setShowMessageBoxId(null); setAdminMessage(''); }}
+                            style={{ background: '#636e72', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 16px', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               )}

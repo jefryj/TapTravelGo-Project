@@ -70,10 +70,19 @@ const bookingSchema = new mongoose.Schema({
   boarding: String,
   bill: Number,
   startDate: String,
-  status: { type: String, default: 'not paid' }, // <-- Add status field
+  status: { type: String, default: 'not paid' },
   createdAt: { type: Date, default: Date.now }
 });
 const Booking = mongoose.model('Booking', bookingSchema, 'booking');
+
+// CancelText schema and model
+const cancelTextSchema = new mongoose.Schema({
+  email: String,
+  message: String,
+  destination: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const CancelText = mongoose.model('CancelText', cancelTextSchema, 'canceltext');
 
 // Signup route
 app.post('/api/signup', async (req, res) => {
@@ -400,6 +409,30 @@ app.delete('/api/booking/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete booking' });
+  }
+});
+
+// Admin sends cancel message to canceltext collection
+app.post('/api/canceltext', async (req, res) => {
+  const { email, message, destination } = req.body;
+  if (!email || !message) return res.status(400).json({ error: 'Email and message required' });
+  try {
+    await CancelText.create({ email, message, destination });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send cancel message' });
+  }
+});
+
+// Fetch cancel messages for a user
+app.get('/api/canceltext', async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.json([]);
+  try {
+    const texts = await CancelText.find({ email });
+    res.json(texts);
+  } catch {
+    res.json([]);
   }
 });
 
