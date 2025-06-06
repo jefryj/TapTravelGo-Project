@@ -47,6 +47,7 @@ function AdminPage() {
     startDate: '',
     status: 'not paid'
   });
+  const [activeTab, setActiveTab] = useState(''); // '', 'notifications', 'booked', 'add', 'edit'
 
   // Fetch packages and bookings on mount
   useEffect(() => {
@@ -55,6 +56,14 @@ function AdminPage() {
       fetchBookings();
     }
   }, [showBooked]);
+
+  // Show Notifications tab: load messages when tab is activated
+  useEffect(() => {
+    if (activeTab === 'notifications') {
+      fetchMessages();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
 
   const fetchPackages = async () => {
     try {
@@ -357,25 +366,58 @@ function AdminPage() {
     .filter(b => b.destination === selectedDestination)
     .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
+  // Only show edit form if a package is selected for editing
+  const showEditForm = activeTab === 'edit' && editId;
+
+  // Button style for all 4 buttons
+  const tabBtnStyle = isActive => ({
+    padding: '10px 18px',
+    background: isActive ? '#0984e3' : '#b2bec3',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 6,
+    fontWeight: 600,
+    cursor: 'pointer',
+    flex: 1,
+    minWidth: 120,
+    transition: 'background 0.2s'
+  });
+
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', padding: 24 }}>
       <h2>Admin Package Management</h2>
-      <button
-        onClick={handleNotificationsClick}
-        style={{
-          marginBottom: 20,
-          padding: '10px 18px',
-          background: '#0984e3',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 6,
-          fontWeight: 600,
-          cursor: 'pointer'
-        }}
-      >
-        {showNotifications ? 'Hide Notifications' : 'Show Notifications'}
-      </button>
-      {showNotifications && (
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+        <button
+          onClick={() => setActiveTab('notifications')}
+          style={tabBtnStyle(activeTab === 'notifications')}
+        >
+          Show Notifications
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('booked');
+            if (!showBooked) setShowBooked(true);
+          }}
+          style={tabBtnStyle(activeTab === 'booked')}
+        >
+          Booked Customers
+        </button>
+        <button
+          onClick={() => setActiveTab('add')}
+          style={tabBtnStyle(activeTab === 'add')}
+        >
+          Add Package
+        </button>
+        <button
+          onClick={() => setActiveTab('edit')}
+          style={tabBtnStyle(activeTab === 'edit')}
+        >
+          Edit Package
+        </button>
+      </div>
+
+      {/* Show Notifications */}
+      {activeTab === 'notifications' && (
         <div style={{
           background: '#f9fafc',
           border: '1px solid #eaeaea',
@@ -386,6 +428,7 @@ function AdminPage() {
           overflowY: 'auto'
         }}>
           <h3 style={{ marginTop: 0 }}>Contact Messages</h3>
+          <button onClick={fetchMessages} style={{ marginBottom: 10, background: '#0984e3', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 14px', fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
           {loadingMessages && <div>Loading...</div>}
           {!loadingMessages && messages.length === 0 && <div>No messages found.</div>}
           {!loadingMessages && messages.length > 0 && (
@@ -409,258 +452,9 @@ function AdminPage() {
           )}
         </div>
       )}
-      <form onSubmit={handleSubmit} style={{ marginBottom: 32, border: '1px solid #ccc', padding: 16, borderRadius: 8 }}>
-        <div style={{ marginBottom: 12 }}>
-          <label>Place Name</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Image URL (Main)</label>
-          <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Additional Image 1</label>
-          <input
-            type="text"
-            name="images[0]"
-            value={form.images[0]}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="URL for additional image 1"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Additional Image 2</label>
-          <input
-            type="text"
-            name="images[1]"
-            value={form.images[1]}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="URL for additional image 2"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Additional Image 3</label>
-          <input
-            type="text"
-            name="images[2]"
-            value={form.images[2]}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="URL for additional image 3"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Price</label>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Description</label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Detailed Description</label>
-          <textarea
-            name="detailedDescription"
-            value={form.detailedDescription}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Day 1</label>
-          <input
-            type="text"
-            name="day1"
-            value={form.day1}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="Itinerary for Day 1"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Day 2</label>
-          <input
-            type="text"
-            name="day2"
-            value={form.day2}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="Itinerary for Day 2"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Day 3</label>
-          <input
-            type="text"
-            name="day3"
-            value={form.day3}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="Itinerary for Day 3"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Day 4</label>
-          <input
-            type="text"
-            name="day4"
-            value={form.day4}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="Itinerary for Day 4"
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>Day 5</label>
-          <input
-            type="text"
-            name="day5"
-            value={form.day5}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: 8, marginTop: 4 }}
-            placeholder="Itinerary for Day 5"
-          />
-        </div>
-        {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}
-        {success && <div style={{ color: 'green', marginBottom: 12 }}>{success}</div>}
-        <button type="submit" style={{ width: '100%', padding: 10 }}>Add Package</button>
-      </form>
 
-      <h3>Existing Packages</h3>
-      <div>
-        {packages.length === 0 && <div>No packages found.</div>}
-        {packages.map(pkg =>
-          editId === pkg._id ? (
-            <form key={pkg._id} onSubmit={handleEditSubmit} style={{ border: '1px solid #0984e3', borderRadius: 8, marginBottom: 16, padding: 12, background: '#f1f8ff' }}>
-              <div style={{ marginBottom: 8 }}>
-                <label>Place Name</label>
-                <input type="text" name="name" value={editForm.name} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Image URL (Main)</label>
-                <input type="text" name="image" value={editForm.image} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Additional Image 1</label>
-                <input type="text" name="images[0]" value={editForm.images[0]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Additional Image 2</label>
-                <input type="text" name="images[1]" value={editForm.images[1]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Additional Image 3</label>
-                <input type="text" name="images[2]" value={editForm.images[2]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Price</label>
-                <input type="number" name="price" value={editForm.price} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Description</label>
-                <textarea name="description" value={editForm.description} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Detailed Description</label>
-                <textarea name="detailedDescription" value={editForm.detailedDescription} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Day 1</label>
-                <input type="text" name="day1" value={editForm.day1} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Day 2</label>
-                <input type="text" name="day2" value={editForm.day2} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Day 3</label>
-                <input type="text" name="day3" value={editForm.day3} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Day 4</label>
-                <input type="text" name="day4" value={editForm.day4} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <label>Day 5</label>
-                <input type="text" name="day5" value={editForm.day5} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
-              </div>
-              <button type="submit" style={{ marginRight: 8, background: '#27ae60', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Save</button>
-              <button type="button" onClick={handleCancelEdit} style={{ background: '#636e72', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Cancel</button>
-            </form>
-          ) : (
-            <div key={pkg._id} style={{ border: '1px solid #ddd', borderRadius: 8, marginBottom: 16, padding: 12, display: 'flex', alignItems: 'center' }}>
-              <img src={pkg.img || pkg.image} alt={pkg.name} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16, borderRadius: 4 }} />
-              <div style={{ flex: 1 }}>
-                <div><strong>{pkg.name}</strong></div>
-                <div>{pkg.desc || pkg.description}</div>
-                <div style={{ color: '#555' }}>{pkg.rate || `₹${pkg.price}`}</div>
-              </div>
-              <button onClick={() => handleEditClick(pkg)} style={{ marginLeft: 8, background: '#0984e3', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
-                Edit
-              </button>
-              <button onClick={() => handleDelete(pkg._id)} style={{ marginLeft: 8, background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
-                Delete
-              </button>
-            </div>
-          )
-        )}
-      </div>
-
-      <button
-        onClick={() => setShowBooked(!showBooked)}
-        style={{
-          marginTop: 40,
-          marginBottom: 20,
-          padding: '10px 18px',
-          background: '#27ae60',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 6,
-          fontWeight: 600,
-          cursor: 'pointer'
-        }}
-      >
-        {showBooked ? 'Hide Booked Customers' : 'Booked Customers'}
-      </button>
-      {showBooked && (
+      {/* Booked Customers */}
+      {activeTab === 'booked' && (
         <div style={{
           background: '#f9fafc',
           border: '1px solid #eaeaea',
@@ -744,13 +538,256 @@ function AdminPage() {
                       Edit
                     </button>
                     <button onClick={() => handleBookingDelete(booking._id)} style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
-                      Delete
+                      Remove Customer
                     </button>
                   </div>
                 )
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Add Package */}
+      {activeTab === 'add' && (
+        <form onSubmit={handleSubmit} style={{ marginBottom: 32, border: '1px solid #ccc', padding: 16, borderRadius: 8 }}>
+          <div style={{ marginBottom: 12 }}>
+            <label>Place Name</label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Image URL (Main)</label>
+            <input
+              type="text"
+              name="image"
+              value={form.image}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Additional Image 1</label>
+            <input
+              type="text"
+              name="images[0]"
+              value={form.images[0]}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="URL for additional image 1"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Additional Image 2</label>
+            <input
+              type="text"
+              name="images[1]"
+              value={form.images[1]}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="URL for additional image 2"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Additional Image 3</label>
+            <input
+              type="text"
+              name="images[2]"
+              value={form.images[2]}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="URL for additional image 3"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Price</label>
+            <input
+              type="number"
+              name="price"
+              value={form.price}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Detailed Description</label>
+            <textarea
+              name="detailedDescription"
+              value={form.detailedDescription}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day 1</label>
+            <input
+              type="text"
+              name="day1"
+              value={form.day1}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="Itinerary for Day 1"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day 2</label>
+            <input
+              type="text"
+              name="day2"
+              value={form.day2}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="Itinerary for Day 2"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day 3</label>
+            <input
+              type="text"
+              name="day3"
+              value={form.day3}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="Itinerary for Day 3"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day 4</label>
+            <input
+              type="text"
+              name="day4"
+              value={form.day4}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="Itinerary for Day 4"
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day 5</label>
+            <input
+              type="text"
+              name="day5"
+              value={form.day5}
+              onChange={handleChange}
+              required
+              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              placeholder="Itinerary for Day 5"
+            />
+          </div>
+          {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}
+          {success && <div style={{ color: 'green', marginBottom: 12 }}>{success}</div>}
+          <button type="submit" style={{ width: '100%', padding: 10 }}>Add Package</button>
+        </form>
+      )}
+
+      {/* Edit Package */}
+      {activeTab === 'edit' && (
+        <div>
+          <h3>Existing Packages</h3>
+          <div>
+            {packages.length === 0 && <div>No packages found.</div>}
+            {packages.map(pkg =>
+              editId === pkg._id ? (
+                <form key={pkg._id} onSubmit={handleEditSubmit} style={{ border: '1px solid #0984e3', borderRadius: 8, marginBottom: 16, padding: 12, background: '#f1f8ff' }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Place Name</label>
+                    <input type="text" name="name" value={editForm.name} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Image URL (Main)</label>
+                    <input type="text" name="image" value={editForm.image} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Additional Image 1</label>
+                    <input type="text" name="images[0]" value={editForm.images[0]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Additional Image 2</label>
+                    <input type="text" name="images[1]" value={editForm.images[1]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Additional Image 3</label>
+                    <input type="text" name="images[2]" value={editForm.images[2]} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Price</label>
+                    <input type="number" name="price" value={editForm.price} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Description</label>
+                    <textarea name="description" value={editForm.description} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Detailed Description</label>
+                    <textarea name="detailedDescription" value={editForm.detailedDescription} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Day 1</label>
+                    <input type="text" name="day1" value={editForm.day1} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Day 2</label>
+                    <input type="text" name="day2" value={editForm.day2} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Day 3</label>
+                    <input type="text" name="day3" value={editForm.day3} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Day 4</label>
+                    <input type="text" name="day4" value={editForm.day4} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <label>Day 5</label>
+                    <input type="text" name="day5" value={editForm.day5} onChange={handleEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                  </div>
+                  <button type="submit" style={{ marginRight: 8, background: '#27ae60', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Save</button>
+                  <button type="button" onClick={handleCancelEdit} style={{ background: '#636e72', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Cancel</button>
+                </form>
+              ) : (
+                <div key={pkg._id} style={{ border: '1px solid #ddd', borderRadius: 8, marginBottom: 16, padding: 12, display: 'flex', alignItems: 'center' }}>
+                  <img src={pkg.img || pkg.image} alt={pkg.name} style={{ width: 80, height: 80, objectFit: 'cover', marginRight: 16, borderRadius: 4 }} />
+                  <div style={{ flex: 1 }}>
+                    <div><strong>{pkg.name}</strong></div>
+                    <div>{pkg.desc || pkg.description}</div>
+                    <div style={{ color: '#555' }}>{pkg.rate || `₹${pkg.price}`}</div>
+                  </div>
+                  <button onClick={() => handleEditClick(pkg)} style={{ marginLeft: 8, background: '#0984e3', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(pkg._id)} style={{ marginLeft: 8, background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                    Delete
+                  </button>
+                </div>
+              )
+            )}
+          </div>
         </div>
       )}
     </div>
