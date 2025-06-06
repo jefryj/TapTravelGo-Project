@@ -367,5 +367,41 @@ app.post('/api/booking/pay', async (req, res) => {
   }
 });
 
+// Get all bookings (for admin)
+app.get('/api/all-bookings', async (req, res) => {
+  try {
+    const bookings = await Booking.find({});
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+});
+
+// Update a booking (admin)
+app.put('/api/booking/:id', async (req, res) => {
+  const { name, email, passengers, boarding, bill, startDate, status } = req.body;
+  try {
+    const updated = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { name, email, passengers, boarding, bill, startDate, status },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Booking not found' });
+    res.json({ success: true, booking: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update booking' });
+  }
+});
+
+// Delete a booking (admin)
+app.delete('/api/booking/:id', async (req, res) => {
+  try {
+    await Booking.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete booking' });
+  }
+});
+
 app.listen(5000, () => console.log('Server running on port 5000'));
 

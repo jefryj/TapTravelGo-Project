@@ -47,6 +47,26 @@ function Mytrips() {
       flexDirection: 'column',
       alignItems: 'center'
     }}>
+      <button
+        onClick={() => navigate('/home')}
+        style={{
+          position: 'absolute',
+          top: 24,
+          left: 24,
+          background: 'linear-gradient(90deg, #0984e3 60%, #00b894 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          fontSize: 16,
+          fontWeight: 600,
+          padding: '10px 22px',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(39, 174, 96, 0.08)',
+          zIndex: 10
+        }}
+      >
+        ← Home
+      </button>
       <h2 style={{
         textAlign: 'center',
         marginTop: '2.5rem',

@@ -34,11 +34,27 @@ function AdminPage() {
     day4: '',
     day5: ''
   });
+  const [showBooked, setShowBooked] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState('');
+  const [bookingEditId, setBookingEditId] = useState(null);
+  const [bookingEditForm, setBookingEditForm] = useState({
+    name: '',
+    email: '',
+    passengers: 1,
+    boarding: '',
+    bill: 0,
+    startDate: '',
+    status: 'not paid'
+  });
 
-  // Fetch packages on mount
+  // Fetch packages and bookings on mount
   useEffect(() => {
     fetchPackages();
-  }, []);
+    if (showBooked) {
+      fetchBookings();
+    }
+  }, [showBooked]);
 
   const fetchPackages = async () => {
     try {
@@ -47,6 +63,16 @@ function AdminPage() {
       setPackages(data);
     } catch {
       setError('Failed to fetch packages');
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/all-bookings');
+      const data = await res.json();
+      setBookings(data);
+    } catch {
+      setBookings([]);
     }
   };
 
@@ -265,6 +291,71 @@ function AdminPage() {
       day5: ''
     });
   };
+
+  // Handle edit form changes for bookings
+  const handleBookingEditChange = e => {
+    const { name, value } = e.target;
+    setBookingEditForm({ ...bookingEditForm, [name]: value });
+  };
+
+  // Start editing a booking
+  const handleBookingEdit = booking => {
+    setBookingEditId(booking._id);
+    setBookingEditForm({
+      name: booking.name,
+      email: booking.email,
+      passengers: booking.passengers,
+      boarding: booking.boarding,
+      bill: booking.bill,
+      startDate: booking.startDate,
+      status: booking.status || 'not paid'
+    });
+  };
+
+  // Save booking edit
+  const handleBookingEditSubmit = async e => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`http://localhost:5000/api/booking/${bookingEditId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingEditForm)
+      });
+      if (!res.ok) {
+        alert('Failed to update booking');
+        return;
+      }
+      setBookingEditId(null);
+      fetchBookings();
+    } catch {
+      alert('Server error');
+    }
+  };
+
+  // Delete a booking
+  const handleBookingDelete = async bookingId => {
+    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/booking/${bookingId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) {
+        alert('Failed to delete booking');
+        return;
+      }
+      fetchBookings();
+    } catch {
+      alert('Server error');
+    }
+  };
+
+  // Unique destinations for buttons
+  const destinations = Array.from(new Set(bookings.map(b => b.destination)));
+
+  // Filtered bookings for selected destination, sorted by startDate
+  const filteredBookings = bookings
+    .filter(b => b.destination === selectedDestination)
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', padding: 24 }}>
@@ -552,6 +643,116 @@ function AdminPage() {
           )
         )}
       </div>
+
+      <button
+        onClick={() => setShowBooked(!showBooked)}
+        style={{
+          marginTop: 40,
+          marginBottom: 20,
+          padding: '10px 18px',
+          background: '#27ae60',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          fontWeight: 600,
+          cursor: 'pointer'
+        }}
+      >
+        {showBooked ? 'Hide Booked Customers' : 'Booked Customers'}
+      </button>
+      {showBooked && (
+        <div style={{
+          background: '#f9fafc',
+          border: '1px solid #eaeaea',
+          borderRadius: 10,
+          marginBottom: 24,
+          padding: 18
+        }}>
+          <h3 style={{ marginTop: 0 }}>Booked Customers</h3>
+          <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {destinations.map(dest => (
+              <button
+                key={dest}
+                onClick={() => setSelectedDestination(dest)}
+                style={{
+                  background: selectedDestination === dest ? '#0984e3' : '#b2bec3',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 18px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                {dest}
+              </button>
+            ))}
+          </div>
+          {selectedDestination && (
+            <div>
+              <h4>Bookings for <span style={{ color: '#0984e3' }}>{selectedDestination}</span></h4>
+              {filteredBookings.length === 0 && <div>No bookings found for this destination.</div>}
+              {filteredBookings.map(booking =>
+                bookingEditId === booking._id ? (
+                  <form key={booking._id} onSubmit={handleBookingEditSubmit} style={{ border: '1px solid #0984e3', borderRadius: 8, marginBottom: 16, padding: 12, background: '#f1f8ff' }}>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Name</label>
+                      <input type="text" name="name" value={bookingEditForm.name} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Email</label>
+                      <input type="email" name="email" value={bookingEditForm.email} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Passengers</label>
+                      <input type="number" name="passengers" value={bookingEditForm.passengers} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Boarding</label>
+                      <input type="text" name="boarding" value={bookingEditForm.boarding} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Bill</label>
+                      <input type="number" name="bill" value={bookingEditForm.bill} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Start Date</label>
+                      <input type="date" name="startDate" value={bookingEditForm.startDate} onChange={handleBookingEditChange} required style={{ width: '100%', padding: 6, marginTop: 2 }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label>Status</label>
+                      <select name="status" value={bookingEditForm.status} onChange={handleBookingEditChange} style={{ width: '100%', padding: 6, marginTop: 2 }}>
+                        <option value="not paid">Not Paid</option>
+                        <option value="paid">Paid</option>
+                      </select>
+                    </div>
+                    <button type="submit" style={{ marginRight: 8, background: '#27ae60', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Save</button>
+                    <button type="button" onClick={() => setBookingEditId(null)} style={{ background: '#636e72', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 4 }}>Cancel</button>
+                  </form>
+                ) : (
+                  <div key={booking._id} style={{ border: '1px solid #ddd', borderRadius: 8, marginBottom: 16, padding: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <div><strong>Name:</strong> {booking.name}</div>
+                      <div><strong>Email:</strong> {booking.email}</div>
+                      <div><strong>Passengers:</strong> {booking.passengers}</div>
+                      <div><strong>Boarding:</strong> {booking.boarding}</div>
+                      <div><strong>Bill:</strong> ₹{booking.bill}</div>
+                      <div><strong>Start Date:</strong> {booking.startDate ? new Date(booking.startDate).toLocaleDateString() : ''}</div>
+                      <div><strong>Status:</strong> <span style={{ color: booking.status === 'paid' ? '#27ae60' : '#e17055' }}>{booking.status}</span></div>
+                    </div>
+                    <button onClick={() => handleBookingEdit(booking)} style={{ background: '#0984e3', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                      Edit
+                    </button>
+                    <button onClick={() => handleBookingDelete(booking._id)} style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 4, cursor: 'pointer' }}>
+                      Delete
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
