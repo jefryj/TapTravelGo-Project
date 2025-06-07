@@ -353,12 +353,19 @@ function AdminPage() {
   const confirmRemoveCustomer = async (bookingId, email) => {
     if (!window.confirm('Are you sure you want to remove this customer?')) return;
     try {
-      // Send cancel message to canceltext collection
-      if (adminMessage && email) {
+      // Find the booking to get destination and startDate
+      const booking = bookings.find(b => b._id === bookingId);
+      // Send cancel message to canceltext collection with trip name and start date
+      if (adminMessage && email && booking) {
         await fetch('http://localhost:5000/api/canceltext', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, message: adminMessage })
+          body: JSON.stringify({
+            email,
+            message: adminMessage,
+            destination: booking.destination || '',
+            startDate: booking.startDate || ''
+          })
         });
       }
       // Remove booking

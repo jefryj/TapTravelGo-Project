@@ -80,6 +80,7 @@ const cancelTextSchema = new mongoose.Schema({
   email: String,
   message: String,
   destination: String,
+  startDate: String, // <-- Add startDate field
   createdAt: { type: Date, default: Date.now }
 });
 const CancelText = mongoose.model('CancelText', cancelTextSchema, 'canceltext');
@@ -414,10 +415,16 @@ app.delete('/api/booking/:id', async (req, res) => {
 
 // Admin sends cancel message to canceltext collection
 app.post('/api/canceltext', async (req, res) => {
-  const { email, message, destination } = req.body;
+  const { email, message, destination, startDate } = req.body;
+  // destination = trip name, startDate = trip start date
   if (!email || !message) return res.status(400).json({ error: 'Email and message required' });
   try {
-    await CancelText.create({ email, message, destination });
+    await CancelText.create({
+      email,
+      message,
+      destination,
+      startDate // <-- Save startDate
+    });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to send cancel message' });

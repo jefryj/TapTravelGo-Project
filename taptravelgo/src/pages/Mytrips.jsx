@@ -50,11 +50,11 @@ function Mytrips() {
     // For each cancelText, create a "fake" trip card if not present in trips
     setRemovedTrips(cancelTexts.map(cancel => ({
       _id: `rejected-${cancel._id || Math.random()}`,
-      destination: cancel.destination || 'Trip',
+      destination: cancel.destination || cancel.packageName || 'Trip',
       passengers: '',
       boarding: '',
       bill: '',
-      startDate: '',
+      startDate: cancel.startDate || '',
       createdAt: cancel.createdAt,
       status: 'rejected',
       email: cancel.email,
@@ -277,7 +277,16 @@ function Mytrips() {
                 </div>
                 <div style={{ color: '#636e72', fontWeight: 500, fontSize: 15, marginBottom: 2 }}>
                   <span>
-                    <strong>Start Date:</strong> N/A
+                    <strong>Start Date:</strong>{' '}
+                    {trip.startDate && trip.startDate !== 'N/A'
+                      ? (() => {
+                          // Support both Date objects and ISO strings
+                          const d = new Date(trip.startDate);
+                          return isNaN(d.getTime())
+                            ? trip.startDate
+                            : d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+                        })()
+                      : 'N/A'}
                   </span>
                 </div>
                 <div style={{
