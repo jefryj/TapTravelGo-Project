@@ -30,6 +30,11 @@ body::before {
   pointer-events: none;
 }
 
+/* Hide the top SVG wave on the MyTrips page */
+body.mytrips-page::before {
+  display: none !important;
+}
+
 /* Decorative SVG wave at the bottom */
 body::after {
   content: "";

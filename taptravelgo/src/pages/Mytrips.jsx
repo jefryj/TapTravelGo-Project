@@ -78,6 +78,14 @@ function Mytrips() {
     return null;
   };
 
+  useEffect(() => {
+    // Add a class to body to disable the top SVG wave for this page
+    document.body.classList.add('mytrips-page');
+    return () => {
+      document.body.classList.remove('mytrips-page');
+    };
+  }, []);
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -108,16 +116,6 @@ function Mytrips() {
       >
         ← Home
       </button>
-      <h2 style={{
-        textAlign: 'center',
-        marginTop: '2.5rem',
-        marginBottom: '2rem',
-        color: '#0984e3',
-        fontWeight: 700,
-        letterSpacing: 1,
-        fontFamily: 'serif',
-        fontSize: '2.2rem'
-      }}>My Trips</h2>
       <div style={{
         width: '100%',
         maxWidth: 700,

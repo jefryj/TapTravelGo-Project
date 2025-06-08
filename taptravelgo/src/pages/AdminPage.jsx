@@ -577,16 +577,32 @@ function AdminPage() {
                           onChange={e => setAdminMessage(e.target.value)}
                           style={{ width: '100%', minHeight: 60, borderRadius: 6, border: '1px solid #b2bec3', marginBottom: 8, padding: 6 }}
                         />
-                        <div>
+                        <div style={{ display: 'flex', gap: 10 }}>
                           <button
                             onClick={() => confirmRemoveCustomer(booking._id, booking.email)}
-                            style={{ background: '#27ae60', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 16px', marginRight: 8, fontWeight: 600, cursor: 'pointer' }}
+                            style={{
+                              background: '#27ae60',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 4,
+                              padding: '6px 16px',
+                              fontWeight: 600,
+                              cursor: 'pointer'
+                            }}
                           >
                             Confirm Remove
                           </button>
                           <button
                             onClick={() => { setShowMessageBoxId(null); setAdminMessage(''); }}
-                            style={{ background: '#636e72', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 16px', fontWeight: 600, cursor: 'pointer' }}
+                            style={{
+                              background: '#636e72',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 4,
+                              padding: '6px 16px',
+                              fontWeight: 600,
+                              cursor: 'pointer'
+                            }}
                           >
                             Cancel
                           </button>
