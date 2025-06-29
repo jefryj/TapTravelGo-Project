@@ -35,16 +35,16 @@ function App() {
               <Home search={search} setSearch={setSearch} />
             </div>
             <div id="aboutus">
-              <AboutUs/>
+              <AboutUs />
             </div>
             <div id="contact">
-              <Contact/>
+              <Contact />
             </div>
-            <Footer/>
+            <Footer />
           </>
         } />
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   )

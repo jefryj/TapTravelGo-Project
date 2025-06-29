@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -7,8 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/taptravelgo', {
+// Connect to MongoDB Atlas using connection string from .env
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -50,6 +51,18 @@ const adminSchema = new mongoose.Schema({
   password: String
 });
 const Admin = mongoose.model('Admin', adminSchema, 'admin');
+
+// Create a default admin if none exists (run once at server start)
+(async () => {
+  const adminCount = await Admin.countDocuments();
+  if (adminCount === 0) {
+    const defaultUsername = 'admin';
+    const defaultPassword = 'admin123'; // Change this after first login!
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    await Admin.create({ username: defaultUsername, password: hashedPassword });
+    console.log('Default admin created:', defaultUsername, defaultPassword);
+  }
+})();
 
 // Message schema and model
 const messageSchema = new mongoose.Schema({
@@ -119,10 +132,16 @@ app.post('/api/login', async (req, res) => {
   try {
     console.log('Login request:', req.body);
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!user) {
+      console.log('User login failed: user not found');
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!valid) {
+      console.log('User login failed: invalid password');
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
 
     res.json({ success: true, user: { name: user.name, email: user.email } });
   } catch (err) {
@@ -140,7 +159,21 @@ app.post('/api/admin/login', async (req, res) => {
   }
   try {
     const admin = await Admin.findOne({ username });
-    if (!admin || admin.password !== password) {
+    if (!admin) {
+      console.log('Admin login failed: user not found');
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    // Support both hashed and plain text passwords
+    let valid = false;
+    if (admin.password.startsWith('$2')) {
+      // bcrypt hash
+      valid = await bcrypt.compare(password, admin.password);
+    } else {
+      // plain text
+      valid = password === admin.password;
+    }
+    if (!valid) {
+      console.log('Admin login failed: invalid password');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     res.json({ success: true, admin: { username: admin.username } });
@@ -165,9 +198,24 @@ app.get('/api/db-status', async (req, res) => {
   }
 });
 
+// Add a ping endpoint for frontend/backend connectivity check
+app.get('/api/ping', async (req, res) => {
+  try {
+    // Try a simple DB command to verify connection
+    await mongoose.connection.db.admin().ping();
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    res.status(500).json({ status: 'error', db: 'not connected', error: err.message });
+  }
+});
+
 // Add this route to get all packages
 app.get('/api/packages', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      console.error('MongoDB not connected when fetching packages');
+      return res.status(500).json({ error: 'Database not connected' });
+    }
     const packages = await Package.find({});
     // Map backend fields to frontend expected fields
     const mapped = packages.map(pkg => ({
@@ -179,6 +227,7 @@ app.get('/api/packages', async (req, res) => {
     }));
     res.json(mapped);
   } catch (err) {
+    console.error('Failed to fetch packages:', err);
     res.status(500).json({ error: 'Failed to fetch packages' });
   }
 });
@@ -443,5 +492,13 @@ app.get('/api/canceltext', async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log('Server running on port 5000'));
+// Wait for MongoDB connection before starting the server
+mongoose.connection.once('open', () => {
+  console.log('MongoDB connection is open. Starting server...');
+  app.listen(5000, () => console.log('Server running on port 5000'));
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err.message);
+});
 
