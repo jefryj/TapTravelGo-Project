@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
+
+.Home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem 1rem;
+  
+}
+
+.home-title {
+  font-size: 2.8rem;
+  font-family: Dosis;
+  color: #1b5793;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(27,87,147,0.08);
+}
+
+.home-subheading {
+  font-size: 1.5rem;
+  color: #c3a53a;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.search-bar {
+  width: 320px;
+  max-width: 90vw;
+  padding: 0.7rem 1.2rem;
+  margin-bottom: 2.2rem;
+  border: 1.5px solid #c3a53a;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border 0.2s;
+  box-shadow: 0 2px 8px rgba(27,87,147,0.04);
+}
+
+.search-bar:focus {
+  border: 2px solid #1b5793;
+}
+
+.slant-cards-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.slant-card {
+  width: 120px;
+  height: 160px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(27,87,147,0.13);
+  transform: rotate(-8deg);
+  transition: transform 0.3s, box-shadow 0.3s;
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+}
+
+.slant-card:nth-child(2) {
+  transform: rotate(6deg);
+  z-index: 2;
+}
+.slant-card:nth-child(3) {
+  transform: rotate(-4deg);
+  z-index: 3;
+}
+.slant-card:hover {
+  transform: scale(1.08) rotate(0deg);
+  box-shadow: 0 12px 32px rgba(27,87,147,0.18);
+  z-index: 10;
+}
+
+.slant-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-taptravelgo-highlight {
+  margin: 2rem 0 1.5rem 0;
+  padding: 1.2rem 2rem;
+  background: linear-gradient(90deg, #e3f0ff 0%, #f7e9e3 100%);
+  border-left: 6px solid #c3a53a;
+  border-radius: 18px;
+  font-size: 1.18rem;
+  color: #1b5793;
+  font-family: 'Dosis', 'Segoe UI', Arial, sans-serif;
+  font-weight: 600;
+  box-shadow: 0 2px 16px rgba(27,87,147,0.08);
+  text-align: center;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 0.5px;
+}
+
+.available-packages-heading {
+  font-size: 2rem;
+  color: #c3a53a;
+  font-family: 'Dosis', 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin: 2.5rem 0 1.5rem 0;
+  text-align: center;
+  text-shadow: 0 2px 8px #1b579344;
+  background: linear-gradient(90deg, #1c1c19 0%, #c3a53a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  width: 260px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.card-rate {
+  margin-top: 0.7rem;
+  font-size: 1.18rem;
+  font-weight: bold;
+  color: black;
+  background: #f7e9e3;
+  border-radius: 8px;
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  letter-spacing: 1px;
+  box-shadow: 0 1px 6px #c3a53a22;
+}
