@@ -7,7 +7,7 @@ function Home({ search, setSearch }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/packages')
+    fetch('/api/packages')
       .then(res => res.json())
       .then(data => setPackages(data))
       .catch(err => setPackages([]));
@@ -41,7 +41,7 @@ function Home({ search, setSearch }) {
       </div>
       <div className="about-taptravelgo-highlight">
         <span>
-          TapTravelGo is your trusted companion for discovering, planning, and booking the most memorable journeys across India. 
+          TapTravelGo is your trusted companion for discovering, planning, and booking the most memorable journeys across India.
           We curate the best destinations and experiences, making travel easy, affordable, and unforgettable.
         </span>
       </div>
@@ -54,7 +54,7 @@ function Home({ search, setSearch }) {
             style={{ cursor: 'pointer' }}
             className="card"
           >
-            <img src={pkg.img} alt={pkg.name} className="card-img"/>
+            <img src={pkg.img} alt={pkg.name} className="card-img" />
             <h3>{pkg.name}</h3>
             <p>{pkg.desc}</p>
             <div className="card-rate">{pkg.rate}</div>

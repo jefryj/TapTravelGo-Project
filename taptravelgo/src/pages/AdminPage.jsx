@@ -74,7 +74,7 @@ function AdminPage() {
 
   const fetchPackages = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/packages');
+      const res = await fetch('/api/packages');
       const data = await res.json();
       setPackages(data);
     } catch {
@@ -84,7 +84,7 @@ function AdminPage() {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/all-bookings');
+      const res = await fetch('/api/all-bookings');
       const data = await res.json();
       setBookings(data);
     } catch {
@@ -95,7 +95,7 @@ function AdminPage() {
   const fetchMessages = async () => {
     setLoadingMessages(true);
     try {
-      const res = await fetch('http://localhost:5000/api/messages');
+      const res = await fetch('/api/messages');
       const data = await res.json();
       setMessages(data);
     } catch {
@@ -135,7 +135,7 @@ function AdminPage() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/packages', {
+      const res = await fetch('/api/packages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,7 +180,7 @@ function AdminPage() {
   const handleDelete = async id => {
     if (!window.confirm('Are you sure you want to delete this package?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/packages/${id}`, {
+      const res = await fetch(`/api/packages/${id}`, {
         method: 'DELETE'
       });
       if (!res.ok) {
@@ -201,7 +201,7 @@ function AdminPage() {
 
   const handleEditClick = async pkg => {
     try {
-      const res = await fetch(`http://localhost:5000/api/packages/${pkg._id}`);
+      const res = await fetch(`/api/packages/${pkg._id}`);
       const data = await res.json();
       setEditId(pkg._id);
       setEditForm({
@@ -270,7 +270,7 @@ function AdminPage() {
     });
 
     try {
-      const res = await fetch(`http://localhost:5000/api/packages/${editId}`, {
+      const res = await fetch(`/api/packages/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -332,7 +332,7 @@ function AdminPage() {
   const handleBookingEditSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5000/api/booking/${bookingEditId}`, {
+      const res = await fetch(`/api/booking/${bookingEditId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingEditForm)
@@ -360,7 +360,7 @@ function AdminPage() {
       const booking = bookings.find(b => b._id === bookingId);
       // Send cancel message to canceltext collection with trip name and start date
       if (adminMessage && email && booking) {
-        await fetch('http://localhost:5000/api/canceltext', {
+        await fetch('/api/canceltext', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -372,7 +372,7 @@ function AdminPage() {
         });
       }
       // Remove booking
-      const res = await fetch(`http://localhost:5000/api/booking/${bookingId}`, {
+      const res = await fetch(`/api/booking/${bookingId}`, {
         method: 'DELETE'
       });
       if (!res.ok) {

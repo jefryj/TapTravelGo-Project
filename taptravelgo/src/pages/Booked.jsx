@@ -16,7 +16,7 @@ function Booked() {
   const [dateError, setDateError] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/packages/${id}`)
+    fetch(`/api/packages/${id}`)
       .then(res => res.json())
       .then(data => setPkg(data));
     // Try to get user info from localStorage/sessionStorage if available
@@ -91,7 +91,7 @@ function Booked() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/booking', {
+      const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingData)
@@ -111,7 +111,7 @@ function Booked() {
     // Navigate to dummy UPI payment page and update status to paid if bookingId is available
     // After booking, fetch the latest booking for this user/package to get the bookingId
     try {
-      const res = await fetch(`http://localhost:5000/api/mytrips?email=${encodeURIComponent(user.email)}`);
+      const res = await fetch(`/api/mytrips?email=${encodeURIComponent(user.email)}`);
       const trips = await res.json();
       // Find the latest booking for this package and user (by createdAt)
       const latest = trips
@@ -119,7 +119,7 @@ function Booked() {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
       if (latest && latest._id) {
         // Mark as paid immediately
-        await fetch('http://localhost:5000/api/booking/pay', {
+        await fetch('/api/booking/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bookingId: latest._id })
@@ -202,24 +202,24 @@ function Booked() {
             <img
               src={
                 pkg.image &&
-                !pkg.image.includes('i.pinimg.com/originals/d8/9e/3d/d89e3d0cc3a4f986b496b1844e1bbac8.jpg')
-                  ? pkg.image
-                  : 'https://via.placeholder.com/400x200?text=Image+Unavailable'
+                !pkg.image.includes('i.pinimg.com/originals/d8/9e/3d/d89e3d0cc3a4f986b496b1844e1bbac8.jpg')')
+            ? pkg.image
+            : 'https://via.placeholder.com/400x200?text=Image+Unavailable'
               }
-              alt={pkg.name}
-              style={{
-                width: '92%',
-                borderRadius: 20,
-                margin: '0 auto 1.2rem auto',
-                maxHeight: 220,
-                objectFit: 'cover',
-                boxShadow: '0 2px 16px rgba(0,0,0,0.11)',
-                display: 'block'
-              }}
-              onError={e => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/400x200?text=Image+Unavailable';
-              }}
+            alt={pkg.name}
+            style={{
+              width: '92%',
+              borderRadius: 20,
+              margin: '0 auto 1.2rem auto',
+              maxHeight: 220,
+              objectFit: 'cover',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.11)',
+              display: 'block'
+            }}
+            onError={e => {
+              e.target.onerror = null;
+              e.target.src = 'https://via.placeholder.com/400x200?text=Image+Unavailable';
+            }}
             />
             <form onSubmit={handleSubmit} style={{ width: '92%', margin: '0 auto', marginTop: 10 }}>
               <div style={{ marginBottom: 18 }}>
@@ -276,7 +276,7 @@ function Booked() {
                 >
                   <option value="">-- Select a Saturday --</option>
                   {availableSaturdays.map(date => (
-                    <option key={date.toISOString().slice(0,10)} value={date.toISOString().slice(0,10)}>
+                    <option key={date.toISOString().slice(0, 10)} value={date.toISOString().slice(0, 10)}>}>
                       {date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}
                     </option>
                   ))}

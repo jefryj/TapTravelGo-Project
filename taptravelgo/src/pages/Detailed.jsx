@@ -13,7 +13,7 @@ function Detailed() {
   const [currentImg, setCurrentImg] = useState(0);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/packages/${id}`)
+    fetch(`/api/packages/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) setError(data.error);
@@ -76,7 +76,7 @@ function Detailed() {
         <div>{pkg.detailedDescription || 'No detailed description available.'}</div>
       </div>
       <div className="detailed-days-cards">
-        {[1,2,3,4,5].map(day => (
+        {[1, 2, 3, 4, 5].map(day => (
           <div className="detailed-day-card" key={day}>
             <div className="detailed-day-title">Day {day}</div>
             <div className="detailed-day-content">{pkg[`day${day}`]}</div>

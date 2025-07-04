@@ -23,7 +23,7 @@ function Mytrips() {
       setLoading(false);
       return;
     }
-    fetch(`http://localhost:5000/api/mytrips?email=${encodeURIComponent(user.email)}`)
+    fetch(`/api/mytrips?email=${encodeURIComponent(user.email)}`)
       .then(res => res.json())
       .then(data => {
         setTrips(data);
@@ -35,7 +35,7 @@ function Mytrips() {
       });
 
     // Fetch cancel texts for this user
-    fetch(`http://localhost:5000/api/canceltext?email=${encodeURIComponent(user.email)}`)
+    fetch(`/api/canceltext?email=${encodeURIComponent(user.email)}`)
       .then(res => res.json())
       .then(data => setCancelTexts(data))
       .catch(() => setCancelTexts([]));
@@ -278,12 +278,12 @@ function Mytrips() {
                     <strong>Start Date:</strong>{' '}
                     {trip.startDate && trip.startDate !== 'N/A'
                       ? (() => {
-                          // Support both Date objects and ISO strings
-                          const d = new Date(trip.startDate);
-                          return isNaN(d.getTime())
-                            ? trip.startDate
-                            : d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-                        })()
+                        // Support both Date objects and ISO strings
+                        const d = new Date(trip.startDate);
+                        return isNaN(d.getTime())
+                          ? trip.startDate
+                          : d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+                      })()
                       : 'N/A'}
                   </span>
                 </div>

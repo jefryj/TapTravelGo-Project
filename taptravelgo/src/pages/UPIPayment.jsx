@@ -13,7 +13,7 @@ function UPIPayment() {
     setPaid(true);
     if (bookingId) {
       try {
-        await fetch('http://localhost:5000/api/booking/pay', {
+        await fetch('/api/booking/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bookingId })
