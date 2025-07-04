@@ -202,24 +202,24 @@ function Booked() {
             <img
               src={
                 pkg.image &&
-                !pkg.image.includes('i.pinimg.com/originals/d8/9e/3d/d89e3d0cc3a4f986b496b1844e1bbac8.jpg')')
-            ? pkg.image
-            : 'https://via.placeholder.com/400x200?text=Image+Unavailable'
+                  !pkg.image.includes('i.pinimg.com/originals/d8/9e/3d/d89e3d0cc3a4f986b496b1844e1bbac8.jpg')
+                  ? pkg.image
+                  : 'https://via.placeholder.com/400x200?text=Image+Unavailable'
               }
-            alt={pkg.name}
-            style={{
-              width: '92%',
-              borderRadius: 20,
-              margin: '0 auto 1.2rem auto',
-              maxHeight: 220,
-              objectFit: 'cover',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.11)',
-              display: 'block'
-            }}
-            onError={e => {
-              e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/400x200?text=Image+Unavailable';
-            }}
+              alt={pkg.name}
+              style={{
+                width: '92%',
+                borderRadius: 20,
+                margin: '0 auto 1.2rem auto',
+                maxHeight: 220,
+                objectFit: 'cover',
+                boxShadow: '0 2px 16px rgba(0,0,0,0.11)',
+                display: 'block'
+              }}
+              onError={e => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/400x200?text=Image+Unavailable';
+              }}
             />
             <form onSubmit={handleSubmit} style={{ width: '92%', margin: '0 auto', marginTop: 10 }}>
               <div style={{ marginBottom: 18 }}>
@@ -276,7 +276,7 @@ function Booked() {
                 >
                   <option value="">-- Select a Saturday --</option>
                   {availableSaturdays.map(date => (
-                    <option key={date.toISOString().slice(0, 10)} value={date.toISOString().slice(0, 10)}>}>
+                    <option key={date.toISOString().slice(0, 10)} value={date.toISOString().slice(0, 10)}>
                       {date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}
                     </option>
                   ))}

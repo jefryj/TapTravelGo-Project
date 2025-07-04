@@ -488,7 +488,7 @@ app.get('/api/canceltext', async (req, res) => {
   }
 });
 
-// Serve static files from the correct frontend build directory
+// Serve static files from the correct frontend build directory (Vite: dist)
 app.use(express.static(path.join(__dirname, '..', 'taptravelgo', 'dist')));
 
 // Catch-all route to serve index.html for React Router (after all API routes)
@@ -500,7 +500,8 @@ app.use((req, res, next) => {
 // Wait for MongoDB connection before starting the server
 mongoose.connection.once('open', () => {
   console.log('MongoDB connection is open. Starting server...');
-  app.listen(5000, () => console.log('Server running on port 5000'));
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
 
 mongoose.connection.on('error', (err) => {
